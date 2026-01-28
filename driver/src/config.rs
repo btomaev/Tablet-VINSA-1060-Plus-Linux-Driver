@@ -5,7 +5,7 @@ use directories::ProjectDirs;
 
 const APP_QUALIFIER: &str = "com";
 const APP_ORG: &str = "theninth";
-const APP_NAME: &str = "vinsas";
+const APP_NAME: &str = "v1060p-driver";
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppConfig {
