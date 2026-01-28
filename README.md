@@ -13,11 +13,11 @@ You need to have Rust installed previously.
 Clone the repository
 ```bash
 git clone https://github.com/btomaev/Tablet-VINSA-1060-Plus-Linux-Driver.git vinsa-1060-driver
+cd vinsa-1060-driver
 ```
 
 Build the driver
 ```bash
-cd vinsa-1060-driver
 cargo build --release
 chmod +x target/release/v1060p-driver
 sudo cp target/release/v1060p-driver /usr/bin/
