@@ -25,7 +25,7 @@ sudo cp target/release/v1060p-driver /usr/bin/
 
 For Install udev rules
 ```bash
-sudo cat <<EOF >> /etc/udev/rules.d/99-vinsa-tablet.rules
+cat <<EOF | sudo tee -a /etc/udev/rules.d/99-vinsa-tablet.rules
 SUBSYSTEM=="usb", ATTR{idVendor}=="08f2", ATTR{idProduct}=="6811", MODE="0666"
 SUBSYSTEM=="input", GROUP="input", MODE="0666"
 KERNEL=="uinput", MODE="0666", GROUP="input"
