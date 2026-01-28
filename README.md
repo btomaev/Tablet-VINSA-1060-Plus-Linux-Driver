@@ -7,8 +7,6 @@ _(It would be interesting if someone has a Huion H1060p tablet and can test the 
 
 The [marvinbelfort](https://github.com/marvinbelfort/mx002_linux_driver) driver has been adapted and expanded for this graphics tablet, improving sensitivity and providing two modes of use: one mouse-like, which uses a smaller area of ​​the tablet and is also customizable according to preferences, and another tablet-like mode, which occupies the entire area and offers greater sensitivity for artistic drawing imitating the Windows driver.
 
-![Buttons help](https://github.com/feveal/Tablet-VINSA-1060-Plus-Linux-Driver/blob/main/driver/launcher/help/v1060p.png)
-
 ## 📦 Installation
 You need to have Rust installed previously.
 
