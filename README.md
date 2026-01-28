@@ -45,6 +45,8 @@ v1060p-driver --config
 ```
 and adjust settings or edit `~/.config/v1060p-driver/settings.json`
 
+No driver reload needed!
+
 ## References
 - [marvinbelfort](https://github.com/marvinbelfort) - Initial research
 - [DIGImend/10moons-tools](https://github.com/DIGImend/10moons-tools) - Expanded mode enablement
