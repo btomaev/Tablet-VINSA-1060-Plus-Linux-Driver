@@ -12,33 +12,35 @@ pub struct PhysicalDevice {
 }
 
 impl PhysicalDevice {
-    pub fn new(vid: u16, pid: u16) -> Self {
-        let device = Self::get_target_device(vid, pid).expect("Error finding device.");
+    pub fn new(vid: u16, pid: u16) -> Result<Self, RusbError> {
+        let device = Self::get_target_device(vid, pid)?; 
+        
+        let device_handle = device.open()?; 
 
-        PhysicalDevice {
+        Ok(PhysicalDevice {
             endpoint_address: 0,
-            device_handle: device.open().expect("Error opening device."),
+            device_handle,
             device,
-        }
+        })
     }
 
     pub fn init(&mut self) -> &mut Self {
-        self.device_handle
-            .set_auto_detach_kernel_driver(true)
-            .expect("Error detaching old driver.");
+        let _ = self.device_handle.set_auto_detach_kernel_driver(true);
 
         let configurations = Self::get_configurations(&self.device);
         let interface_descriptors = Self::get_hid_interface_descriptors(&configurations);
 
         for interface_descriptor in interface_descriptors {
-            self.device_handle
+            if self.device_handle
                 .claim_interface(interface_descriptor.interface_number())
-                .expect("Error claiming interface.");
-            for endpoint_descriptor in interface_descriptor.endpoint_descriptors() {
-                if endpoint_descriptor.transfer_type() == TransferType::Interrupt
-                    && endpoint_descriptor.max_packet_size() == 64
-                {
-                    self.endpoint_address = endpoint_descriptor.address();
+                .is_ok() 
+            {
+                for endpoint_descriptor in interface_descriptor.endpoint_descriptors() {
+                    if endpoint_descriptor.transfer_type() == TransferType::Interrupt
+                        && endpoint_descriptor.max_packet_size() == 64
+                    {
+                        self.endpoint_address = endpoint_descriptor.address();
+                    }
                 }
             }
         }
@@ -47,19 +49,18 @@ impl PhysicalDevice {
     }
 
     pub fn reset(&mut self) {
-        self.device_handle.reset().expect("Error reseting device.");
+        let _ = self.device_handle.reset();
     }
 
     pub fn read_device_responses(&self, buffer: &mut [u8]) -> Result<usize, RusbError> {
         self.device_handle
-            .read_interrupt(self.endpoint_address, buffer, Duration::from_secs(3))
+            .read_interrupt(self.endpoint_address, buffer, Duration::from_secs(1))
     }
 
     pub fn set_full_mode(&mut self) -> &mut Self {
         const REPORTS: [[u8; 8]; 1] = [[0x08, 0x03, 0x00, 0xff, 0xf0, 0x00, 0xff, 0xf0]];
         let reports_as_slices: Vec<&[u8]> = REPORTS.iter().map(|r| &r[..]).collect();
-        self.set_report(&reports_as_slices)
-            .expect("Error sending report.");
+        let _ = self.set_report(&reports_as_slices);
         self
     }
 
@@ -79,8 +80,10 @@ impl PhysicalDevice {
     }
 
     fn is_target_device(vid: u16, pid: u16, device: &Device<GlobalContext>) -> bool {
-        let device_descriptor = device.device_descriptor().unwrap();
-        device_descriptor.vendor_id() == vid && device_descriptor.product_id() == pid
+        if let Ok(device_descriptor) = device.device_descriptor() {
+            return device_descriptor.vendor_id() == vid && device_descriptor.product_id() == pid;
+        }
+        false
     }
 
     fn get_target_device(vid: u16, pid: u16) -> Result<Device<GlobalContext>, RusbError> {
@@ -92,9 +95,10 @@ impl PhysicalDevice {
             None => Err(RusbError::NoDevice),
         }
     }
+    
     fn get_hid_interface_descriptors(
         config_descriptors: &[ConfigDescriptor],
-    ) -> Vec<InterfaceDescriptor> {
+    ) -> Vec<InterfaceDescriptor<'_>> {
         config_descriptors
             .iter()
             .flat_map(|config_descriptor| config_descriptor.interfaces())
@@ -106,9 +110,12 @@ impl PhysicalDevice {
     }
 
     fn get_configurations(device: &Device<GlobalContext>) -> Vec<ConfigDescriptor> {
-        let device_descriptor = device.device_descriptor().unwrap();
-        (0..device_descriptor.num_configurations())
+        if let Ok(device_descriptor) = device.device_descriptor() {
+            (0..device_descriptor.num_configurations())
             .filter_map(|n| device.config_descriptor(n).ok())
             .collect()
+        } else {
+            vec![]
+        }
     }
 }
