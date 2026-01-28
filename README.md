@@ -39,7 +39,11 @@ sudo udevadm trigger
 ```
 
 ## Configuration
-Run v1060p-driver --config and adjust settings or edit `~/.config/v1060p-driver/settings.json`
+Run 
+```bash
+v1060p-driver --config
+```
+and adjust settings or edit `~/.config/v1060p-driver/settings.json`
 
 ## References
 - [marvinbelfort](https://github.com/marvinbelfort) - Initial research
