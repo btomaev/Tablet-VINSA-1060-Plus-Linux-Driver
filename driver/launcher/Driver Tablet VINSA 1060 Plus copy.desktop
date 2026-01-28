@@ -1,14 +1,14 @@
 [Desktop Entry]
 Categories=Utility;
-Comment=Driver for VINSA graphics tablet
-Exec=v1060p-driver
+Comment=Driver configuration for VINSA graphics tablet
+Exec=v1060p-driver --config
 GenericName=
 Icon=/home/*user*/Driver_tablet/vinsa1060.png
 MimeType=
-Name=Driver Tablet VINSA 1060 Plus
+Name=Settings for Tablet VINSA 1060 Plus
 Path=
 StartupNotify=false
-Terminal=true
+Terminal=false
 TerminalOptions=
 Type=Application
 Version=1.0
